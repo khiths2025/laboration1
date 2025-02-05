@@ -1,0 +1,16 @@
+Spelet kräver att man har Python och Pip installerat.
+
+För att köra spelet gör följande:
+pip install -r requirements.txt
+python3 game.py
+
+Spelet implementerar BlackJack som beskrivet i laborationsinstruktionerna.
+
+Instruktioner för att spela:
+Hit         H
+Stand       S
+Ny runda    N
+
+Sprites skapade av och nedladdade från: https://ivoryred.itch.io/pixel-poker-cards
+
+Font skapad av och nedladdad från: https://www.dafont.com/minecraft.font
