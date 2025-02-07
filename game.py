@@ -1,4 +1,4 @@
-import sys, pygame, enum, collections, random
+import sys, pygame, enum, collections, random, dataclasses
 
 X_RESOLUTION = 1600
 Y_RESOLUTION = 900
@@ -22,7 +22,7 @@ class GameState(enum.Enum):
     PLAYER_WIN = enum.auto()
     DEALER_WIN = enum.auto()
 
-def pretty_print_gamestate(gamestate):
+def pretty_print_gamestate(gamestate: GameState):
     if gamestate == GameState.PLAYER_ROUND:
         return "Player's round"
     elif gamestate == GameState.DEALER_ROUND:
@@ -32,19 +32,22 @@ def pretty_print_gamestate(gamestate):
     elif gamestate == GameState.DEALER_WIN:
         return "You lost! New round?"
 
-Card = collections.namedtuple("Card", "id value")
+@dataclasses.dataclass
+class Card:
+    id: int
+    value: int
 
-def get_img_path_from_card(card):
+def get_img_path_from_card(card: Card) -> str:
     return f'assets/card_{card.id}.png'
 
-def draw_card_to_hand(deck, hand):
+def draw_card_to_hand(deck: list[Card], hand: list[Card]) -> None:
     hand.append(deck.pop())
 
-def load_and_upscale_img(path):
+def load_and_upscale_img(path: str) -> pygame.Surface:
     img = pygame.image.load(path)
     return pygame.transform.scale(img, (img.get_width() * SCALING_FACTOR, img.get_height() * SCALING_FACTOR))
 
-def calc_hand_value(hand):
+def calc_hand_value(hand: list[Card]) -> int:
     high_ace_value, low_ace_value = 0, 0
     for card in hand:
         high_ace_value += card.value
@@ -57,6 +60,10 @@ def calc_hand_value(hand):
     else:
         return high_ace_value
 
+def draw_hand_to_screen(screen: pygame.Surface, hand: list[Card], y_coordinate: int) -> None:
+    for i, card in enumerate(hand):
+        card_img = load_and_upscale_img(get_img_path_from_card(card))
+        screen.blit(card_img, (BORDER_SIZE + (i * card_img.get_width()), y_coordinate))
 
 class Blackjack:
     def __init__(self):
@@ -127,12 +134,7 @@ class Blackjack:
             ]
         random.shuffle(self.deck)
         self.player_hand = []
-        self.dealer_hand = []
-    
-    def draw_hand_to_screen(self, hand, y_coordinate):
-        for i, card in enumerate(hand):
-            card_img = load_and_upscale_img(get_img_path_from_card(card))
-            self.screen.blit(card_img, (BORDER_SIZE + (i * card_img.get_width()), y_coordinate))
+        self.dealer_hand = []   
 
     def run(self):
         while True:
@@ -162,8 +164,8 @@ class Blackjack:
             self.screen.blit(deck_img, ((X_RESOLUTION // 2) - (deck_img.get_width() // 2), BORDER_SIZE))
             self.screen.blit(self.font.render(RULES_TEXT, False, TEXT_COLOR, wraplength=WRAP_LENGTH), RULES_TEXT_COORD)
             self.screen.blit(self.font.render(pretty_print_gamestate(self.gamestate), False, TEXT_COLOR), STATE_TEXT_COORD)
-            self.draw_hand_to_screen(self.dealer_hand, Y_RESOLUTION // 3)
-            self.draw_hand_to_screen(self.player_hand, (Y_RESOLUTION // 3) * 2)      
+            draw_hand_to_screen(self.screen, self.dealer_hand, Y_RESOLUTION // 3)
+            draw_hand_to_screen(self.screen, self.player_hand, (Y_RESOLUTION // 3) * 2)      
             pygame.display.update()
             self.clock.tick(60)
             
