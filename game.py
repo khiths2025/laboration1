@@ -63,7 +63,12 @@ def calc_hand_value(hand: list[Card]) -> int:
 def draw_hand_to_screen(screen: pygame.Surface, hand: list[Card], y_coordinate: int) -> None:
     for i, card in enumerate(hand):
         card_img = load_and_upscale_img(get_img_path_from_card(card))
-        screen.blit(card_img, (BORDER_SIZE + (i * card_img.get_width()), y_coordinate))
+        x_coordinate = (X_RESOLUTION // 2) - (card_img.get_width() // 2)
+        if i % 2 == 1:
+            x_coordinate -= ((i + 1) // 2) * card_img.get_width()
+        else:
+            x_coordinate += (i // 2)  * card_img.get_width()        
+        screen.blit(card_img, (x_coordinate, y_coordinate))
 
 class Blackjack:
     def __init__(self):
